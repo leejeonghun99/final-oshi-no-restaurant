@@ -18,7 +18,7 @@ import java.util.List;
 public class SearchController {
 
     private final SearchService searchService;
-
+    // 피이지 최초 접속
     @GetMapping("/card")
     public String card(@RequestParam(value = "query", defaultValue = "") String keyword,@RequestParam(defaultValue = "0")int page, Model model) {
 
@@ -36,18 +36,20 @@ public class SearchController {
 
         return "search/cardSearchPage";
     }
-
+    // 페이지 검색
     @PostMapping("/card")
     @ResponseBody
-    public List<SearchResultDTO> cardPage(@RequestParam(defaultValue = "") String keyword,@RequestParam(defaultValue = "0")int page) {
+    public List<SearchResultDTO> cardPage(@RequestParam(defaultValue = "") String keyword,@RequestParam(defaultValue = "0")int page, @RequestParam(required = false) List<String> category ) {
 
         log.info("🚀🚀 [ SearchController ] keyword : {} page : {} 🚀🚀", keyword, page);
 
         List<SearchResultDTO> restaurantLists = new ArrayList<>();
 
+        // 카테고리
         int size = 30;
         if (keyword != null && !keyword.isEmpty()) {
-            restaurantLists = searchService.selectQueryByKeyword(keyword, page, size);
+//             restaurantLists = searchService.selectQueryByKeyword(keyword, page, size);
+             restaurantLists = searchService.selectQueryByKeywords(keyword, page, size, category);
             if (!restaurantLists.isEmpty()) {
                 log.info("🚀🚀 [ SearchController ] restaurantLists[0] : {} 🚀🚀", restaurantLists.get(0));
             }

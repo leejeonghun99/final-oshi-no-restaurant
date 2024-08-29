@@ -156,4 +156,11 @@ public class SearchService {
         }
         return entityList;
     }
+
+    public List<SearchResultDTO> selectQueryByKeywords(String keyword, int page, int size, List<String> category) {
+        Pageable pageable = PageRequest.of(page, size);
+         List<Object[]> results = restaurantRepository.findAllByKeywords(keyword, pageable,category);
+
+        return results.stream().map(this::mapToSearchResultDTO).collect(Collectors.toList());
+    }
 }

@@ -158,4 +158,46 @@ public interface RestaurantRepository extends JpaRepository<RestaurantInfo, Long
     List<Object[]> findTotalStatisticsByRestaurantNo(@Param("restaurantNo") Long loginedRestaurantNo,
                                                      @Param("startDay") LocalDate startDay,
                                                      @Param("endDay") LocalDate endDay);
+
+
+
+
+    @Query(value = "SELECT r.restaurant_no, " +
+                "r.restaurant_name, " +
+                "r.restaurant_address, " +
+                "r.x_coordinate, " +
+                "r.y_coordinate, " +
+                "r.img_url, " +
+                "GROUP_CONCAT(DISTINCT CONCAT('#', ft.food_type) ORDER BY ft.food_type ASC SEPARATOR ' ') AS food_type, " +
+                "GROUP_CONCAT(DISTINCT CONCAT('#', ht.hash_tag) ORDER BY ht.hash_tag ASC SEPARATOR ' ') AS hash_tag, " +
+                "ar.rating " +
+                "FROM tbl_restaurant_info r " +
+                "LEFT JOIN tbl_food_type ft ON r.restaurant_no = ft.restaurant_no " +
+                "LEFT JOIN tbl_menu m ON m.restaurant_no = r.restaurant_no " +
+                "LEFT JOIN tbl_hash_tag ht ON ht.restaurant_no = r.restaurant_no " +
+                "LEFT JOIN tbl_average_rating ar ON ar.restaurant_no = r.restaurant_no " +
+                "WHERE ( r.restaurant_name LIKE CONCAT('%',:keyword,'%') " +
+                "OR r.restaurant_address LIKE CONCAT('%',:keyword,'%') " +
+                "OR r.description LIKE CONCAT('%',:keyword,'%') " +
+                "OR ft.food_type LIKE CONCAT('%',:keyword,'%') " +
+                "OR m.menu_name LIKE CONCAT('%',:keyword,'%') " +
+                "OR m.description LIKE CONCAT('%',:keyword,'%') " +
+                "OR ht.hash_tag LIKE CONCAT('%',:keyword,'%')  ) " +
+                "AND ft.food_type IN (:category) GROUP BY r.restaurant_no, r.restaurant_name, r.restaurant_address, " +
+                "r.x_coordinate, r.y_coordinate, r.img_url",
+                countQuery = "SELECT COUNT(*) " +
+                        "FROM tbl_restaurant_info r " +
+                        "LEFT JOIN tbl_food_type ft ON r.restaurant_no = ft.restaurant_no " +
+                        "LEFT JOIN tbl_menu m ON m.restaurant_no = r.restaurant_no " +
+                        "LEFT JOIN tbl_hash_tag ht ON ht.restaurant_no = r.restaurant_no " +
+                        "LEFT JOIN tbl_average_rating ar ON ar.restaurant_no = r.restaurant_no " +
+                        "WHERE ( r.restaurant_name LIKE CONCAT('%',:keyword,'%') " +
+                        "OR r.restaurant_address LIKE CONCAT('%',:keyword,'%') " +
+                        "OR r.description LIKE CONCAT('%',:keyword,'%') " +
+                        "OR ft.food_type LIKE CONCAT('%',:keyword,'%') " +
+                        "OR m.menu_name LIKE CONCAT('%',:keyword,'%') " +
+                        "OR m.description LIKE CONCAT('%',:keyword,'%') " +
+                        "OR ht.hash_tag LIKE CONCAT('%',:keyword,'%') ) ",
+                nativeQuery = true)
+    List<Object[]> findAllByKeywords(String keyword, Pageable pageable, List<String> category);
 }

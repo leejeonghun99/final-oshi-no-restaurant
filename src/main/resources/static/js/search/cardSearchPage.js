@@ -16,7 +16,11 @@ $(document).ready(function () {
 
     function loadMoreRestaurants() {
         const keyword = new URLSearchParams(window.location.search).get('query');  // 예: 검색어가 있는 경우
+        const form = document.getElementById('categoryForm');
+        const checkboxes = form.querySelectorAll('input[name="categories"]:checked');
 
+        const checkedValues = Array.from(checkboxes).map(checkbox => checkbox.value);
+        console.log(checkedValues);
         if(isRequestInProgress){
             return;
         }
@@ -28,7 +32,8 @@ $(document).ready(function () {
             dataType: 'json',
             data: {
                 keyword: keyword,
-                page: currentPage
+                page: currentPage,
+                category: checkedValues
             },
             success: function(data) {
                 console.log(data);
